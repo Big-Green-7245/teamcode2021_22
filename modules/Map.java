@@ -1,6 +1,9 @@
-import java.sql.Array;
-import java.util.*;
 
+package org.firstinspires.ftc.teamcode;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+import java.util.*;
 // The Map Itself
 public class Map
 {
@@ -112,8 +115,25 @@ public class Map
 
         public static List<double[]> ORDER_INTERSECTS(List<double[]> intersects, double[] startPoint)
         {
-            intersects.sort((double[] intersect1, double[] intersect2) -> (int) (GET_LENGTH(startPoint, intersect1) - GET_LENGTH(startPoint, intersect2)));
+            intersects.sort(new LINE_FUNCTIONS().new SortIntersects(startPoint));
             return intersects;
+        }
+
+        public class SortIntersects implements Comparator
+        {
+            private double[] startPoint;
+
+            public SortIntersects(double[] startPos)
+            {
+                startPoint = startPos;
+            }
+
+            public int compare(Object obj1, Object obj2)
+            {
+                double[] intersect1 = (double[])obj1;
+                double[] intersect2 = (double[])obj2;
+                return (int) (GET_LENGTH(startPoint, intersect1) - GET_LENGTH(startPoint, intersect2));
+            }
         }
 
         public static double GET_PATH_LENGTH (List<double[]> path)
@@ -169,8 +189,26 @@ public class Map
     // Short shapes according to the reverse of their order of intersection with the line
     public void OrderShapes(double[] startPoint, double[] endPoint)
     {
-        MapObjects.sort((MapObject obj1, MapObject obj2) -> (int)(obj1.PosOnLine(startPoint, endPoint) - obj2.PosOnLine(startPoint, endPoint)));
+        MapObjects.sort(new SortPosOnLine(startPoint, endPoint));
         Collections.reverse(MapObjects);
+    }
+
+    // Comparator for the pos on line of two map objects
+    private class SortPosOnLine implements Comparator<MapObject>
+    {
+        private double[] startPoint;
+        private double[] endPoint;
+
+        public SortPosOnLine(double[] startPos, double[] endPos)
+        {
+            startPoint = startPos;
+            endPoint = endPos;
+        }
+
+        public int compare(MapObject obj1, MapObject obj2)
+        {
+            return (int) (obj1.PosOnLine(startPoint, endPoint)- obj2.PosOnLine(startPoint, endPoint));
+        }
     }
 
 
@@ -184,8 +222,9 @@ public class Map
         OrderShapes(startPoint, endPoint);
 
         // Initialize path for robot given start point and end point
-        List<double[]> path = new ArrayList<>(List.of(startPoint, endPoint));
-
+        List<double[]> path = new ArrayList<>();
+        path.add(startPoint);
+        path.add(endPoint);
         // Clear path for each shape
         for (int i = 0; i < MapObjects.size(); i++)
         {
@@ -905,7 +944,11 @@ public class Map
         public HybridObject(List<MapObject> compObjects)
         {
             CompObjects = compObjects;
-            compObjects.stream().forEach(obj -> super.Name += obj.Name);
+
+            for (MapObject obj: compObjects)
+            {
+                super.Name += obj.Name;
+            }
         }
 
         // Add anew object to the comp object
@@ -987,17 +1030,9 @@ public class Map
         }
     }
 
-    // public static void main(String[] args)
-    // {
-    //     Map myMap = new Map(20, 20);
-    //     myMap.CreateCircleObject(0, 0, 4, false, "Circle");
-    //     double[] startPos = new double[] {-10, 0};
-    //     double[] endPos = new double[] {10, 0};
-    //     List<double[]> path = myMap.ClearPath(startPos, endPos,0.001);
-    //     System.out.println("Path length " + path.size() + " " + LINE_FUNCTIONS.GET_PATH_LENGTH(path));
-    //     for (double[] point: path)
-    //     {
-    //         System.out.println(point[0] + ", " + point[1]);
-    //     }
-    // }
+    public static void main(String[] args)
+    {
+
+
+    }
 }
