@@ -45,7 +45,7 @@ public class Nav {
      * including angles, gravity, and magnetic field
      * 
      */
-    public void updateSensorInfo() {
+    private void updateSensorInfo() {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         gravity = imu.getGravity();
         magneticField = imu.getMagneticFieldStrength();
@@ -65,6 +65,7 @@ public class Nav {
      * 
      */
     public double[] getMagneticFieldDirection() {
+        updateSensorInfo();
         return magFieldAngle;
     }
 
@@ -76,6 +77,7 @@ public class Nav {
      * 
      */
     public double[] getOrientation() {
+        updateSensorInfo();
         return new double[]{formatAngle(angles.angleUnit, angles.firstAngle), 
             formatAngle(angles.angleUnit, angles.secondAngle), 
             formatAngle(angles.angleUnit, angles.thirdAngle)};
