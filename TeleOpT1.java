@@ -19,9 +19,9 @@ import java.util.*;
 import org.firstinspires.ftc.teamcode.util.*;
 import org.firstinspires.ftc.teamcode.modules.*;
 
-@TeleOp(name="TeleOpP1", group="opmode")
+@TeleOp(name="TeleOpT1", group="opmode")
 //@Disabled
-public class TeleOpP1 extends LinearOpMode {
+public class TeleOpT1 extends LinearOpMode {
     // Attributes
     final String programVer = "1.0";
 
@@ -37,7 +37,7 @@ public class TeleOpP1 extends LinearOpMode {
                 
         TelemetryWrapper.init(telemetry, 12);
 
-        TelemetryWrapper.setLine(1, "TeleOpP1 v" + programVer + "\t Press start to start >");
+        TelemetryWrapper.setLine(1, "TeleOpT1 v" + programVer + "\t Press start to start >");
         waitForStart();
 
         nav.updateSensorInfo();
@@ -46,14 +46,11 @@ public class TeleOpP1 extends LinearOpMode {
         while(opModeIsActive()) {
             nav.updateSensorInfo();
             // Mecanum wheels
-            // backLeft.setPower((gamepad1.left_stick_y + gamepad1.left_stick_x + (gamepad1.right_stick_x)));
-            // backRight.setPower((gamepad1.left_stick_y - gamepad1.left_stick_x - (gamepad1.right_stick_x)));
-            // frontLeft.setPower((gamepad1.left_stick_y + gamepad1.left_stick_x - (gamepad1.right_stick_x)));
-            // frontRight.setPower((gamepad1.left_stick_y - gamepad1.left_stick_x + (gamepad1.right_stick_x)));
+            
             driveTrain.move(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
 
             // Add data for orientation
-            TelemetryWrapper.setLine(1, "TeleOpP1 v" + programVer);
+            TelemetryWrapper.setLine(1, "TeleOpT1 v" + programVer);
             TelemetryWrapper.setLine(2, "Magnetic Fields " + Arrays.toString(nav.getMagneticFieldDirection()));
             TelemetryWrapper.setLine(3, "Gyro Orientation " + Arrays.toString(nav.getOrientation()));
         }
