@@ -62,10 +62,10 @@ public class DriveTrain {
      * power for turning the robot's orientation
      * 
      */
-    public void move(double powerx, double powery, double turn) {
-        speedx = powerx;
-        speedy = powery;
-        offset = turn;
+    public void move(double powerx, double powery, double turn, double factor) {
+        speedx = factor * powerx;
+        speedy = factor * powery;
+        offset = factor * turn;
 
         // NEED UPDATE FOR ROBOT SPECIFIC CONDIGURATION
         frontLeft.setPower(Range.clip(speedy-speedx+offset,-1,1));
@@ -81,6 +81,6 @@ public class DriveTrain {
      * 
      */
     public void stop() {
-        move(0, 0, 0);
+        move(0, 0, 0, 0);
     }
 }

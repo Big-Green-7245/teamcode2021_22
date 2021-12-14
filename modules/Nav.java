@@ -13,11 +13,14 @@ public class Nav {
 
     BNO055IMU imu;
 
+    DriveTrain chasis = null;
+
     Orientation angles;
     Acceleration gravity;
     MagneticFlux magneticField;
 
     double[] magFieldAngle = {0, 0, 0};
+    double[] referenceOrientation = {0, 0, 0};
 
 
     /**
@@ -39,6 +42,10 @@ public class Nav {
         imu.initialize(parameters);
     }
 
+    public void initDriveTrain(DriveTrain dTrain) {
+        chasis = dTrain;
+    }
+
     /**
      * 
      * Updates the sensors for information from the imu
@@ -56,10 +63,22 @@ public class Nav {
         magFieldAngle[2] = Math.toDegrees(Math.atan2(magneticField.z, magneticField.x));
     }
 
+
     /**
      * 
-     * Return the translated (from magnetic flux) angle of the magnetic field
-     * as seen 
+     * Turns the robot a certain number of degrees (± 3.6 deg)
+     * 
+     * (CCW:+, CW:-)
+     * 
+     */
+    public void turnDeg(int deg) {
+
+    }
+
+    /**
+     * 
+     * Return the translated (from magnetic flux) angle
+     * of the magnetic field as seen 
      * 
      * [XY, YZ, ZX]
      * 
@@ -71,12 +90,13 @@ public class Nav {
 
     /**
      * 
-     * Returns the current orientation of the robot as per the gyro sensors 
+     * Returns the current orientation of the robot as
+     * per the gyro sensors 
      * 
      * [Yaw/Heading, Roll/Attitude, Pitch/Bank]
      * 
      */
-    public double[] getOrientation() {
+    private double[] getRawOrientation() {
         updateSensorInfo();
         return new double[]{formatAngle(angles.angleUnit, angles.firstAngle), 
             formatAngle(angles.angleUnit, angles.secondAngle), 
@@ -85,13 +105,27 @@ public class Nav {
 
     /**
      * 
+     * Returns the current orientation of the robot as
+     * per the gyro sensors, with respect to the initial reference position
+     * 
+     * [Yaw/Heading, Roll/Attitude, Pitch/Bank]
+     * 
+     */
+    public double[] getOrientation() {
+        updateSensorInfo();
+        return new double[]{formatAngle(angles.angleUnit, angles.firstAngle) - referenceOrientation[0], 
+            formatAngle(angles.angleUnit, angles.secondAngle) - referenceOrientation[1], 
+            formatAngle(angles.angleUnit, angles.thirdAngle) - referenceOrientation[2]};
+    }
+
+    /**
+     * 
      * Resets the orientation tracker (gyro) to 0
      * aka, initializes a new instance of the tracker.
      * 
      */
-    public void resetOrientationTrack() {
-        imu.stopAccelerationIntegration();
-        imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+    public void resetOrientationRef() {
+        referenceOrientation = getRawOrientation();
     }
 
     public double formatAngle(AngleUnit angleUnit, double angle) {
