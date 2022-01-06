@@ -67,7 +67,6 @@ public class DriveTrain {
         speedy = factor * powery;
         offset = factor * turn;
 
-        // NEED UPDATE FOR ROBOT SPECIFIC CONDIGURATION
         frontLeft.setPower(Range.clip(speedy-speedx+offset,-1,1));
         frontRight.setPower(Range.clip(speedy+speedx-offset,-1,1));
         backLeft.setPower(Range.clip(speedy+speedx+offset,-1,1));
