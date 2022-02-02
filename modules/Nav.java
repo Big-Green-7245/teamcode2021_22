@@ -17,24 +17,20 @@ public class Nav {
     Acceleration gravity;
     MagneticFlux magneticField;
 
-    // 1: XY, 2: XZ, 3: YZ
-    final int ORIENTATION_PLANE = 3;
-
-    BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-
     double[] magFieldAngle = {0, 0, 0};
     double[] referenceOrientation = {0, 0, 0};
 
 
     /**
-     * 
+     *
      * Initializes module with a hardwareMap from robot
      * @param map hardware map of current robot
-     * 
+     *
      */
     public void init(HardwareMap map) {
         hwMap = map;
 
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.loggingEnabled      = true;
@@ -45,10 +41,10 @@ public class Nav {
     }
 
     /**
-     * 
+     *
      * Updates the sensors for information from the imu
      * including angles, gravity, and magnetic field
-     * 
+     *
      */
     private void updateSensorInfo() {
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -63,44 +59,67 @@ public class Nav {
 
 
     /**
-     * 
+     *
+     * Turns the robot a certain number of degrees (± 3.6 deg)
+     *
+     * (CCW:+, CW:-)
+     *
+     */
+    public void turnDeg(int deg) {
+
+    }
+
+    /**
+     *
      * Return the translated (from magnetic flux) angle
-     * of the magnetic field as seen 
-     * 
+     * of the magnetic field as seen
+     *
      * [XY, YZ, ZX]
-     * 
+     *
      */
     public double[] getMagneticFieldDirection() {
         updateSensorInfo();
         return magFieldAngle;
     }
 
-
     /**
-     * 
+     *
      * Returns the current orientation of the robot as
-     * per the gyro sensors, with respect to the initial reference position
-     * 
+     * per the gyro sensors
+     *
      * [Yaw/Heading, Roll/Attitude, Pitch/Bank]
-     * 
+     *
      */
-    public double[] getOrientation() {
+    private double[] getRawOrientation() {
         updateSensorInfo();
-        return new double[]{formatAngle(angles.angleUnit, angles.firstAngle), 
-            formatAngle(angles.angleUnit, angles.secondAngle), 
-            formatAngle(angles.angleUnit, angles.thirdAngle)};
+        return new double[]{formatAngle(angles.angleUnit, angles.firstAngle),
+                formatAngle(angles.angleUnit, angles.secondAngle),
+                formatAngle(angles.angleUnit, angles.thirdAngle)};
     }
 
     /**
-     * 
+     *
+     * Returns the current orientation of the robot as
+     * per the gyro sensors, with respect to the initial reference position
+     *
+     * [Yaw/Heading, Roll/Attitude, Pitch/Bank]
+     *
+     */
+    public double[] getOrientation() {
+        updateSensorInfo();
+        return new double[]{formatAngle(angles.angleUnit, angles.firstAngle) - referenceOrientation[0],
+                formatAngle(angles.angleUnit, angles.secondAngle) - referenceOrientation[1],
+                formatAngle(angles.angleUnit, angles.thirdAngle) - referenceOrientation[2]};
+    }
+
+    /**
+     *
      * Resets the orientation tracker (gyro) to 0
      * aka, initializes a new instance of the tracker.
-     * 
+     *
      */
-    // DEPRECATED
-    public void resetOrientation() {
-        //referenceOrientation = getRawOrientation();
-        imu.initialize(parameters);
+    public void resetOrientationRef() {
+        referenceOrientation = getRawOrientation();
     }
 
     public double formatAngle(AngleUnit angleUnit, double angle) {

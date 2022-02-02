@@ -22,20 +22,20 @@ public class ButtonHelper {
      * A button for use in the pressed(), released(), and pressing() methods
      */
     public static final int dpad_up            =  0,
-                            dpad_down          =  1,
-                            dpad_left          =  2,
-                            dpad_right         =  3,
-                            a                  =  4,
-                            b                  =  5,
-                            x                  =  6,
-                            y                  =  7,
-                            guide              =  8,
-                            start              =  9,
-                            back               = 10,
-                            left_bumper        = 11,
-                            right_bumper       = 12,
-                            left_stick_button  = 13,
-                            right_stick_button = 14;
+            dpad_down          =  1,
+            dpad_left          =  2,
+            dpad_right         =  3,
+            a                  =  4,
+            b                  =  5,
+            x                  =  6,
+            y                  =  7,
+            guide              =  8,
+            start              =  9,
+            back               = 10,
+            left_bumper        = 11,
+            right_bumper       = 12,
+            left_stick_button  = 13,
+            right_stick_button = 14;
 
     public ButtonHelper(final Gamepad gamepad) {
         this.gamepad = gamepad;
