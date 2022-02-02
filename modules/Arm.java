@@ -1,21 +1,17 @@
 package org.firstinspires.ftc.teamcode.modules;
 
 import com.qualcomm.robotcore.hardware.CRServo;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.teamcode.modules.*;
-import org.firstinspires.ftc.teamcode.util.*;
 
 public class Arm
 {
-    public DcMotor Lever;
-    public Servo BoxJoint;
-    public CRServo BoxFinger;
+    public DcMotor lever;
+    public Servo boxJoint;
+    public CRServo boxSuction;
     private ElapsedTime runtime = new ElapsedTime();
 
     public boolean isAtFetchPos = true;
@@ -25,63 +21,67 @@ public class Arm
 
     public Arm(HardwareMap hwMap)
     {
-        BoxJoint = hwMap.get(Servo.class, "boxJoint");
-        BoxFinger = hwMap.get(CRServo.class, "boxFinger");
-        BoxFinger.setDirection(DcMotorSimple.Direction.FORWARD);
+        boxJoint = hwMap.get(Servo.class, "boxJoint");
+        boxSuction = hwMap.get(CRServo.class, "boxFinger");
+        boxSuction.setDirection(DcMotorSimple.Direction.FORWARD);
 
         setBoxFetch(isAtFetchPos);
 
-        Lever = hwMap.get(DcMotor.class, "arm");
-        Lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lever = hwMap.get(DcMotor.class, "arm");
+        lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void MoveArm(double power)
+    public void rotateArm(double power)
     {
-        Lever.setPower(power);
+        lever.setPower(power);
     }
 
-    public void moveArmDist(int timeout) {
+    public void deposit(int rotTicks, int timeout) {
+        lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         runtime.reset();
-        Lever.setTargetPosition(Lever.getCurrentPosition() - 700);
-        Lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lever.setPower(0.75);
-        while(Lever.isBusy() && runtime.seconds() < timeout) {}
-        Lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lever.setTargetPosition(lever.getCurrentPosition() - rotTicks);
+        lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lever.setPower(0.7);
+        while(lever.isBusy() && runtime.seconds() < timeout) {}
+        lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        runtime.reset();
+        setSuctionPower(-1.0);
+        while(runtime.seconds() < 2) {}
+        lever.setTargetPosition(lever.getCurrentPosition() + rotTicks);
+        lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lever.setPower(0.8);
+        while(lever.isBusy() && runtime.seconds() < timeout) {}
+        lever.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void deposit(int timeout) {
-        Lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         runtime.reset();
-        Lever.setTargetPosition(Lever.getCurrentPosition() - 1200);
-        Lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lever.setPower(0.7);
-        while(Lever.isBusy() && runtime.seconds() < timeout) {}
-        Lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lever.setTargetPosition(lever.getCurrentPosition() - 1200);
+        lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lever.setPower(0.7);
+        while(lever.isBusy() && runtime.seconds() < timeout) {}
+        lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         runtime.reset();
-        SpinFinger(-1.0);
+        setSuctionPower(-1.0);
         while(runtime.seconds() < 2) {}
-        Lever.setTargetPosition(Lever.getCurrentPosition() + 1200);
-        Lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        Lever.setPower(0.8);
-        while(Lever.isBusy() && runtime.seconds() < timeout) {}
-        Lever.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lever.setTargetPosition(lever.getCurrentPosition() + 1200);
+        lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lever.setPower(0.8);
+        while(lever.isBusy() && runtime.seconds() < timeout) {}
+        lever.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void setBoxPos(double pos) {
-        BoxJoint.setPosition(pos);
+        boxJoint.setPosition(pos);
     }
     public void setBoxFetch(boolean state) {
-        if(state) BoxJoint.setPosition(SERVO_FETCH_POS);
-        else BoxJoint.setPosition(SERVO_DROP_POS);
+        if(state) boxJoint.setPosition(SERVO_FETCH_POS);
+        else boxJoint.setPosition(SERVO_DROP_POS);
     }
 
-    public void toggleBoxStatus() {
-        isAtFetchPos = !isAtFetchPos;
-        setBoxFetch(isAtFetchPos);
-    }
-
-    public void SpinFinger(double power)
+    public void setSuctionPower(double power)
     {
-        BoxFinger.setPower(power);
+        boxSuction.setPower(power);
     }
 }
