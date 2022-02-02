@@ -13,11 +13,14 @@ public class Nav {
 
     BNO055IMU imu;
 
-    DriveTrain chasis = null;
-
     Orientation angles;
     Acceleration gravity;
     MagneticFlux magneticField;
+
+    // 1: XY, 2: XZ, 3: YZ
+    final int ORIENTATION_PLANE = 3;
+
+    BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
     double[] magFieldAngle = {0, 0, 0};
     double[] referenceOrientation = {0, 0, 0};
@@ -32,7 +35,6 @@ public class Nav {
     public void init(HardwareMap map) {
         hwMap = map;
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.loggingEnabled      = true;
@@ -40,10 +42,6 @@ public class Nav {
 
         imu = hwMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-    }
-
-    public void initDriveTrain(DriveTrain dTrain) {
-        chasis = dTrain;
     }
 
     /**
@@ -66,17 +64,6 @@ public class Nav {
 
     /**
      * 
-     * Turns the robot a certain number of degrees (± 3.6 deg)
-     * 
-     * (CCW:+, CW:-)
-     * 
-     */
-    public void turnDeg(int deg) {
-
-    }
-
-    /**
-     * 
      * Return the translated (from magnetic flux) angle
      * of the magnetic field as seen 
      * 
@@ -88,20 +75,6 @@ public class Nav {
         return magFieldAngle;
     }
 
-    /**
-     * 
-     * Returns the current orientation of the robot as
-     * per the gyro sensors 
-     * 
-     * [Yaw/Heading, Roll/Attitude, Pitch/Bank]
-     * 
-     */
-    private double[] getRawOrientation() {
-        updateSensorInfo();
-        return new double[]{formatAngle(angles.angleUnit, angles.firstAngle), 
-            formatAngle(angles.angleUnit, angles.secondAngle), 
-            formatAngle(angles.angleUnit, angles.thirdAngle)};
-    }
 
     /**
      * 
@@ -113,9 +86,9 @@ public class Nav {
      */
     public double[] getOrientation() {
         updateSensorInfo();
-        return new double[]{formatAngle(angles.angleUnit, angles.firstAngle) - referenceOrientation[0], 
-            formatAngle(angles.angleUnit, angles.secondAngle) - referenceOrientation[1], 
-            formatAngle(angles.angleUnit, angles.thirdAngle) - referenceOrientation[2]};
+        return new double[]{formatAngle(angles.angleUnit, angles.firstAngle), 
+            formatAngle(angles.angleUnit, angles.secondAngle), 
+            formatAngle(angles.angleUnit, angles.thirdAngle)};
     }
 
     /**
@@ -124,8 +97,10 @@ public class Nav {
      * aka, initializes a new instance of the tracker.
      * 
      */
-    public void resetOrientationRef() {
-        referenceOrientation = getRawOrientation();
+    // DEPRECATED
+    public void resetOrientation() {
+        //referenceOrientation = getRawOrientation();
+        imu.initialize(parameters);
     }
 
     public double formatAngle(AngleUnit angleUnit, double angle) {
