@@ -82,7 +82,7 @@ public class TeleOpT1 extends LinearOpMode {
                 else carousel.setPower(0);
             }
 
-            if(gp2.pressing(gp2.dpad_left)) arm.deposit(10);
+            if(gp2.pressing(gp2.dpad_left)) arm.deposit(1100, 500, 10);
 
             arm.setBoxFetch(isAtFetch);
 

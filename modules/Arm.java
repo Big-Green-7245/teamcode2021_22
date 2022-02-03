@@ -36,20 +36,28 @@ public class Arm
         lever.setPower(power);
     }
 
-    public void deposit(int rotTicks, int timeout) {
+    public void deposit(int rotTicks, int slowTicks, int timeout) {
         lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         runtime.reset();
-        lever.setTargetPosition(lever.getCurrentPosition() - rotTicks);
+        lever.setTargetPosition(lever.getCurrentPosition() - (rotTicks - slowTicks));
         lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lever.setPower(0.7);
+        while(lever.isBusy() && runtime.seconds() < timeout) {}
+        lever.setTargetPosition(lever.getCurrentPosition() - slowTicks);
+        lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lever.setPower(0.4);
         while(lever.isBusy() && runtime.seconds() < timeout) {}
         lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         runtime.reset();
         setSuctionPower(-1.0);
         while(runtime.seconds() < 2) {}
-        lever.setTargetPosition(lever.getCurrentPosition() + rotTicks);
+        lever.setTargetPosition(lever.getCurrentPosition() + (rotTicks - slowTicks));
         lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lever.setPower(0.8);
+        while(lever.isBusy() && runtime.seconds() < timeout) {}
+        lever.setTargetPosition(lever.getCurrentPosition() + slowTicks);
+        lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lever.setPower(0.4);
         while(lever.isBusy() && runtime.seconds() < timeout) {}
         lever.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }

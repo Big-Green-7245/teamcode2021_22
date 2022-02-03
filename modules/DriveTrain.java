@@ -183,7 +183,7 @@ public class DriveTrain
         return new double[]{frontLeft.getCurrentPosition(), frontRight.getCurrentPosition(), backLeft.getCurrentPosition(), backRight.getCurrentPosition()};
     }
 
-    public String GetEncPosStr() {
+    public String getEncPosStr() {
         return "FL" + frontLeft.getCurrentPosition() + " FR" + frontRight.getCurrentPosition() +
                 " BL" + backLeft.getCurrentPosition() + " BR" + backRight.getCurrentPosition() +  "X: " + position[0] + "Y: " + position[1];
     }
