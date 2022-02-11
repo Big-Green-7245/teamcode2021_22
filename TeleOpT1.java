@@ -58,6 +58,9 @@ public class TeleOpT1 extends LinearOpMode {
             } else if(gp2.pressing(gp2.dpad_down)) {
                 arm.setBoxPos(arm.boxJoint.getPosition() - 0.05);
             }
+
+            TelemetryWrapper.setLine(5, driveTrain.getEncPosStr());
+
             TelemetryWrapper.setLine(8, "servoPos = " + arm.boxJoint.getPosition());
             // Update buttonhelper
             gp1.update();
@@ -83,6 +86,9 @@ public class TeleOpT1 extends LinearOpMode {
             }
 
             if(gp2.pressing(gp2.dpad_left)) arm.deposit(1100, 500, 10);
+
+            if(gp1.pressing(gp1.dpad_left)) driveTrain.translate(0.5, 10, 0, 0, 100);
+            if(gp1.pressing(gp1.dpad_right)) driveTrain.translate(0.5, 0, 10, 0, 100);
 
             arm.setBoxFetch(isAtFetch);
 

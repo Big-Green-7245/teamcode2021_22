@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.modules;
 
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,6 +14,7 @@ import org.firstinspires.ftc.teamcode.util.*;
 public class DriveTrain
 {
     private ElapsedTime runtime = new ElapsedTime();
+    DecimalFormat nF = new DecimalFormat("#.00");
 
     final double XY_CORRECTION = 10/9.2;
     final double COUNTS_PER_INCH = 27.7;
@@ -19,7 +22,6 @@ public class DriveTrain
 
     public HardwareMap hwMap;
     public double[] position = {0, 0};
-    // org.firstinspires.ftc.teamcode.modules.Map MainMap;
     Nav direction;
 
     DcMotor backLeft;
@@ -29,32 +31,27 @@ public class DriveTrain
 
     public void init(HardwareMap map, double length, double breadth)
     {
-
         hwMap = map;
 
         backLeft = hwMap.get(DcMotor.class, "leftBack");
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         backRight = hwMap.get(DcMotor.class, "rightBack");
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setDirection(DcMotor.Direction.FORWARD);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         frontLeft = hwMap.get(DcMotor.class, "leftFront");
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         frontRight = hwMap.get(DcMotor.class, "rightFront");
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setDirection(DcMotor.Direction.REVERSE);
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // MainMap = new org.firstinspires.ftc.teamcode.modules.Map(length, breadth);
         direction = new Nav();
         direction.init(hwMap);
@@ -95,6 +92,8 @@ public class DriveTrain
         double speedy = factor * powery;
         double offset = factor * turn;
 
+        TelemetryWrapper.setLine(7, "move-param: " + nF.format(speedy-speedx-offset) + ":" + nF.format(speedy+speedx+offset) + ":" + nF.format(speedy+speedx-offset) + ":" + nF.format(speedy-speedx+offset));
+
         frontLeft.setPower(Range.clip(speedy-speedx-offset,-1,1));
         frontRight.setPower(Range.clip(speedy+speedx+offset,-1,1));
         backLeft.setPower(Range.clip(speedy+speedx-offset,-1,1));
@@ -103,6 +102,7 @@ public class DriveTrain
 
     public void Translate(double distance, double speed)
     {
+
         frontLeft.setTargetPosition(frontLeft.getCurrentPosition() + (int) (distance *COUNTS_PER_INCH));
         frontRight.setTargetPosition(frontRight.getCurrentPosition() + (int) (distance*COUNTS_PER_INCH));
         backLeft.setTargetPosition(backLeft.getCurrentPosition() + (int) (distance*COUNTS_PER_INCH));
@@ -135,12 +135,17 @@ public class DriveTrain
         int dFL, dFR, dBL, dBR;
         int maxDelta;
 
+        position = new double[]{position[0] + dX,position[1] + dY};
+        
         // Determine new target position, and pass to motor controller
         dFL = (int)((-dY -dX * XY_CORRECTION) * COUNTS_PER_INCH + dTheta * COUNTS_PER_DEGREE);
         dFR = (int)((-dY +dX * XY_CORRECTION) * COUNTS_PER_INCH - dTheta * COUNTS_PER_DEGREE);
         dBL = (int)((-dY +dX * XY_CORRECTION) * COUNTS_PER_INCH + dTheta * COUNTS_PER_DEGREE);
         dBR = (int)((-dY -dX * XY_CORRECTION) * COUNTS_PER_INCH - dTheta * COUNTS_PER_DEGREE);
         maxDelta = max(max((int)(abs(dBL)), (int)(abs(dFL))), max((int)(abs(dBR)), (int)(abs(dFR))));
+
+        setModeToAllDriveMotors(DcMotor.RunMode.RUN_USING_ENCODER);
+        setModeToAllDriveMotors(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         newFLTarget = frontLeft.getCurrentPosition() + dFL;
         newFRTarget = frontRight.getCurrentPosition() + dFR;
@@ -160,23 +165,24 @@ public class DriveTrain
 
         setZeroPowerBehaviorToAllDriveMotors(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        frontLeft.setPower(Range.clip(abs(power * dFL / maxDelta), 0, 1));
-        frontRight.setPower(Range.clip(abs(power * dFR / maxDelta), 0, 1));
-        backLeft.setPower(Range.clip(abs(power * dBL / maxDelta), 0, 1));
-        backRight.setPower(Range.clip(abs(power * dBR / maxDelta), 0, 1));
+        frontLeft.setPower(power);
+        frontRight.setPower(power);
+        backLeft.setPower(power);
+        backRight.setPower(power);
 
         TelemetryWrapper.setLine(0,  "Running to (x:y:r)=("+dX+":"+dY +":"+dTheta+")");
         TelemetryWrapper.setLine(1,  "Wheels to (lf:rf:lr:rr) ("+newFLTarget+":"+newFRTarget +":"+newBLTarget+":"+newBRTarget+")");
-        while ((runtime.seconds() < timeout) || (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy())) {
+        while ((runtime.seconds() < timeout) && (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy())) {
             TelemetryWrapper.setLine(2,  "Running @ ("+frontLeft.getCurrentPosition()+":"+frontRight.getCurrentPosition()
                     +":"+backLeft.getCurrentPosition()+":"+backRight.getCurrentPosition()+")");
         }
 
         // Stop all motion;
         setPowerToAllDriveMotors(0);
+        TelemetryWrapper.setLine(10, "Motor power 0");
 
         // Turn off RUN_TO_POSITION
-        // setModeToAllDriveMotors(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setModeToAllDriveMotors(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public double[] getEncPos() {
@@ -185,7 +191,7 @@ public class DriveTrain
 
     public String getEncPosStr() {
         return "FL" + frontLeft.getCurrentPosition() + " FR" + frontRight.getCurrentPosition() +
-                " BL" + backLeft.getCurrentPosition() + " BR" + backRight.getCurrentPosition() +  "X: " + position[0] + "Y: " + position[1];
+                " BL" + backLeft.getCurrentPosition() + " BR" + backRight.getCurrentPosition() +  "\tX: " + position[0] + "Y: " + position[1];
     }
 
     public void initEnc() {

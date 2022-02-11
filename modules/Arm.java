@@ -16,8 +16,8 @@ public class Arm
 
     public boolean isAtFetchPos = true;
 
-    private final double SERVO_FETCH_POS = 0.6;
-    private final double SERVO_DROP_POS = 0.4;
+    private final double SERVO_FETCH_POS = 0.4;
+    private final double SERVO_DROP_POS = 0.2;
 
     public Arm(HardwareMap hwMap)
     {
@@ -37,29 +37,38 @@ public class Arm
     }
 
     public void deposit(int rotTicks, int slowTicks, int timeout) {
+        // Set to noFetch
+        setBoxFetch(false);
         lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         runtime.reset();
+        // Start lift
         lever.setTargetPosition(lever.getCurrentPosition() - (rotTicks - slowTicks));
         lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lever.setPower(0.7);
         while(lever.isBusy() && runtime.seconds() < timeout) {}
+        // Continue slow lift
         lever.setTargetPosition(lever.getCurrentPosition() - slowTicks);
         lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lever.setPower(0.4);
         while(lever.isBusy() && runtime.seconds() < timeout) {}
+        // Stop lift
         lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         runtime.reset();
+        // Spit object
         setSuctionPower(-1.0);
-        while(runtime.seconds() < 2) {}
+        while(runtime.seconds() < 3) {}
+        setSuctionPower(0);
+        // Start descent
         lever.setTargetPosition(lever.getCurrentPosition() + (rotTicks - slowTicks));
         lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lever.setPower(0.8);
         while(lever.isBusy() && runtime.seconds() < timeout) {}
         lever.setTargetPosition(lever.getCurrentPosition() + slowTicks);
         lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lever.setPower(0.4);
+        lever.setPower(0.2);
         while(lever.isBusy() && runtime.seconds() < timeout) {}
         lever.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        setBoxFetch(true);
     }
 
     public void deposit(int timeout) {
