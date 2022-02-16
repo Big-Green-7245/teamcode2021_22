@@ -53,21 +53,18 @@ public class TeleOpT1 extends LinearOpMode {
         double[] magInitial = nav.getMagneticFieldDirection();
 
         while(opModeIsActive()) {
-            if(gp2.pressing(gp2.dpad_up)) {
-                arm.setBoxPos(arm.boxJoint.getPosition() + 0.05);
-            } else if(gp2.pressing(gp2.dpad_down)) {
-                arm.setBoxPos(arm.boxJoint.getPosition() - 0.05);
-            }
-
-            TelemetryWrapper.setLine(5, driveTrain.getEncPosStr());
-
-            TelemetryWrapper.setLine(8, "servoPos = " + arm.boxJoint.getPosition());
             // Update buttonhelper
             gp1.update();
             gp2.update();
 
             // Mecanum wheels
             driveTrain.move((gamepad1.left_stick_x), (gamepad1.left_stick_y), (gamepad1.right_stick_x), speedMultiplier);
+
+            if(gp2.pressing(gp2.dpad_up)) {
+                arm.setBoxPos(arm.boxJoint.getPosition() + 0.05);
+            } else if(gp2.pressing(gp2.dpad_down)) {
+                arm.setBoxPos(arm.boxJoint.getPosition() - 0.05);
+            }
 
             if(gp2.pressing(gp2.x)) {
                 isAtFetch = ! isAtFetch;
@@ -102,6 +99,10 @@ public class TeleOpT1 extends LinearOpMode {
             TelemetryWrapper.setLine(2, "Magnetic Fields " + Arrays.toString(nav.getMagneticFieldDirection()));
             TelemetryWrapper.setLine(3, "Gyro Orientation " + Arrays.toString(nav.getOrientation()));
             TelemetryWrapper.setLine(4, "Joystick (X, Y, R) " + gamepad1.left_stick_x + " " + gamepad1.left_stick_y + " " + gamepad1.right_stick_x);
+            TelemetryWrapper.setLine(5, "isSucking=" + isSucking);
+            TelemetryWrapper.setLine(6, "isAtFetch=" + isAtFetch);
+            TelemetryWrapper.setLine(7, "suckPowerStatus = " + arm.boxSuction.getPower());
+            TelemetryWrapper.setLine(8, "boxPosStatus = " + arm.boxJoint.getPosition());
         }
 
     }
