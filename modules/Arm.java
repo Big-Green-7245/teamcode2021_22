@@ -16,8 +16,8 @@ public class Arm
 
     public boolean isAtFetchPos = true;
 
-    private final double SERVO_FETCH_POS = 0.65;
-    private final double SERVO_DROP_POS = 0.45;
+    private final double SERVO_FETCH_POS = 0.4;
+    private final double SERVO_DROP_POS = 0.2;
 
     public Arm(HardwareMap hwMap)
     {
@@ -35,6 +35,101 @@ public class Arm
     {
         lever.setPower(power);
     }
+    
+    public void depositButBetter(int rotTicks, int slowTicks, int timeout, int layer) {
+        if (layer == 3) {
+            // Set to noFetch
+            setBoxFetch(false);
+            lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            runtime.reset();
+            // Start lift
+            lever.setTargetPosition(lever.getCurrentPosition() - 625);
+            lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lever.setPower(0.6);
+            while(lever.isBusy() && runtime.seconds() < timeout){
+            }
+            lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            
+            setBoxPos(1.0);
+            // Spit object
+            setSuctionPower(-1.0);
+            while (runtime.seconds() < 3) {
+            }
+            setSuctionPower(0);
+            setBoxPos(0.25);
+            // Start descent
+            // Start lift
+            lever.setTargetPosition(lever.getCurrentPosition() + 625);
+            lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lever.setPower(0.3);
+            while(lever.isBusy() && runtime.seconds() < timeout){
+            }
+            lever.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            setBoxFetch(true);
+            setBoxFetch(true);
+        }else if (layer == 2)
+        {
+            // Set to noFetch
+            setBoxFetch(false);
+            lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            runtime.reset();
+            // Start lift
+            lever.setTargetPosition(lever.getCurrentPosition() - 500);
+            lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lever.setPower(0.6);
+            while(lever.isBusy() && runtime.seconds() < timeout){
+            }
+            lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            
+            setBoxPos(1.0);
+            // Spit object
+            setSuctionPower(-1.0);
+            while (runtime.seconds() < 3) {
+            }
+            setSuctionPower(0);
+            setBoxPos(0.35);
+            // Start descent
+            // Start lift
+            lever.setTargetPosition(lever.getCurrentPosition() + 500);
+            lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lever.setPower(0.3);
+            while(lever.isBusy() && runtime.seconds() < timeout){
+            }
+            lever.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            setBoxFetch(true);
+        }else if (layer == 1)
+        {
+            // Set to noFetch
+            setBoxFetch(false);
+            lever.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            runtime.reset();
+            // Start lift
+            lever.setTargetPosition(lever.getCurrentPosition() - 300);
+            lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lever.setPower(0.6);
+            while(lever.isBusy() && runtime.seconds() < timeout){
+            }
+            lever.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            
+            setBoxPos(0.75);
+            // Spit object
+            setSuctionPower(-1.0);
+            while (runtime.seconds() < 3) {
+            }
+            setSuctionPower(0);
+            setBoxPos(0.35);
+            // Start descent
+            // Start lift
+            lever.setTargetPosition(lever.getCurrentPosition() + 300);
+            lever.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lever.setPower(0.3);
+            while(lever.isBusy() && runtime.seconds() < timeout){
+            }
+            lever.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            setBoxFetch(true);
+        }
+    }
+    
 
     public void deposit(int rotTicks, int slowTicks, int timeout) {
         // Set to noFetch
