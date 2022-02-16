@@ -16,8 +16,8 @@ public class Arm
 
     public boolean isAtFetchPos = true;
 
-    private final double SERVO_FETCH_POS = 0.4;
-    private final double SERVO_DROP_POS = 0.2;
+    private final double SERVO_FETCH_POS = 0.65;
+    private final double SERVO_DROP_POS = 0.45;
 
     public Arm(HardwareMap hwMap)
     {

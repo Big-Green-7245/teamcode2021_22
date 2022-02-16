@@ -92,7 +92,7 @@ public class DriveTrain
         double speedy = factor * powery;
         double offset = factor * turn;
 
-        TelemetryWrapper.setLine(7, "move-param: " + nF.format(speedy-speedx-offset) + ":" + nF.format(speedy+speedx+offset) + ":" + nF.format(speedy+speedx-offset) + ":" + nF.format(speedy-speedx+offset));
+        //TelemetryWrapper.setLine(7, "move-param: " + nF.format(speedy-speedx-offset) + ":" + nF.format(speedy+speedx+offset) + ":" + nF.format(speedy+speedx-offset) + ":" + nF.format(speedy-speedx+offset));
 
         frontLeft.setPower(Range.clip(speedy-speedx-offset,-1,1));
         frontRight.setPower(Range.clip(speedy+speedx+offset,-1,1));
@@ -136,7 +136,7 @@ public class DriveTrain
         int maxDelta;
 
         position = new double[]{position[0] + dX,position[1] + dY};
-        
+
         // Determine new target position, and pass to motor controller
         dFL = (int)((-dY -dX * XY_CORRECTION) * COUNTS_PER_INCH + dTheta * COUNTS_PER_DEGREE);
         dFR = (int)((-dY +dX * XY_CORRECTION) * COUNTS_PER_INCH - dTheta * COUNTS_PER_DEGREE);
